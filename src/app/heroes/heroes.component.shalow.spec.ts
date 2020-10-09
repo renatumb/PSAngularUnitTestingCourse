@@ -52,4 +52,13 @@ describe('HeroesComponent - Shallow test', () => {
     expect(fixture.componentInstance.heroes.length).toBe(3);
   });
 
+  it('Should create 1 li for each hero', () => {
+    MockHeroService.getHeroes.and.returnValue(of(HEROES));
+    fixture.detectChanges();
+
+   // fixture.nativeElement.getElementsByTagName('li')
+   // fixture.debugElement.nativeElement.getElementsByTagName('li')
+    expect(fixture.nativeElement.getElementsByTagName('li').length).toBe(HEROES.length);
+  });
+
 });
