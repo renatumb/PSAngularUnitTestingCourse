@@ -5,8 +5,10 @@ import {HeroesComponent} from './heroes.component';
 import {HeroService} from '../hero.service';
 import {of} from 'rxjs/internal/observable/of';
 import {Hero} from '../hero';
+import {HeroComponent} from '../hero/hero.component';
+import {By} from '@angular/platform-browser';
 
-describe('HeroesComponent - SHALLOW test', () => {
+describe('HeroesComponent - DEEP test', () => {
 
   let fixture: ComponentFixture<HeroesComponent>;
   let MockHeroService;
@@ -17,14 +19,6 @@ describe('HeroesComponent - SHALLOW test', () => {
     {id: 3, name: 'SpiderDude3', strength: 10},
   ];
 
-  @Component({
-    selector: 'app-hero',
-    template: '<div></div>'
-  })
-  class FakeHeroComponent {
-    @Input() hero: Hero;
-    // @Output() delete = new EventEmitter();
-  }
 
   beforeEach(() => {
     MockHeroService = jasmine.createSpyObj(['getHeroes', 'addHero', 'deleteHero']);
@@ -36,29 +30,25 @@ describe('HeroesComponent - SHALLOW test', () => {
     ];
 
     TestBed.configureTestingModule({
-      declarations: [HeroesComponent, FakeHeroComponent],
+      declarations: [HeroesComponent, HeroComponent],
       providers: [
         {provide: HeroService, useValue: MockHeroService}
-      ]
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
     });
 
     fixture = TestBed.createComponent(HeroesComponent);
+
   });
 
-  it('Should set heroes correctly from the service', () => {
-
-    MockHeroService.getHeroes.and.returnValue(of(HEROES));
-    fixture.detectChanges();
-    expect(fixture.componentInstance.heroes.length).toBe(3);
-  });
-
-  it('Should create 1 li for each hero', () => {
+  it('Should set heroes correctly from the serviceXX', () => {
     MockHeroService.getHeroes.and.returnValue(of(HEROES));
     fixture.detectChanges();
 
-   // fixture.nativeElement.getElementsByTagName('li')
-   // fixture.debugElement.nativeElement.getElementsByTagName('li')
-    expect(fixture.nativeElement.getElementsByTagName('li').length).toBe(HEROES.length);
-  });
+    const heroComponentDEs = fixture.debugElement.queryAll(By.directive(HeroComponent));
 
+    for (let i = 0; i < heroComponentDEs.length; i++) {
+      expect(heroComponentDEs[i].componentInstance.hero).toEqual(HEROES[i]);
+    }
+  });
 });
