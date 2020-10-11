@@ -51,4 +51,27 @@ describe('HeroesComponent - DEEP test', () => {
       expect(heroComponentDEs[i].componentInstance.hero).toEqual(HEROES[i]);
     }
   });
+
+  it('Should call heroService.deleteHero when the hero compoent\'s button is clicked ', () => {
+    MockHeroService.getHeroes.and.returnValue(of(HEROES));
+    fixture.detectChanges();
+
+    spyOn(fixture.componentInstance, 'deleteHero'); /// It watches the method on the component -->> HeroesComponent.delete
+                                                            // which is checked in expect(...) line
+
+    const heroComponentDEs = fixture.debugElement.queryAll(By.directive(HeroComponent));
+
+    let eventObject = {
+      stopPropagation: () => {
+        console.log(new Date() + ' INSIDE eventObject.stopPropagation()');
+      }
+    };
+    heroComponentDEs[0].queryAll(By.css('button'))[0].triggerEventHandler('click', eventObject); // Trigger the event
+                                                 // manually: IT is the same as clicking... IT meas going thru HeroComponent.onDeleteClick()
+
+    (<HeroComponent>heroComponentDEs[0].componentInstance).delete.emit(); // IT just emitting the event which is captured by the
+                                                                          // parent html template in '(delete)="deleteHero(hero)'
+
+    expect(fixture.componentInstance.deleteHero).toHaveBeenCalledWith(HEROES[0]); //
+  });
 });

@@ -23,14 +23,14 @@ describe('Hero Component', () => {
   it('Should remove the indicated Hero from the Heroes list ', () => {
     heroesComponent.heroes = HEROES;
     heroService.deleteHero.and.returnValue(of(true));
-    heroesComponent.delete(HEROES[0]);
+    heroesComponent.deleteHero(HEROES[0]);
     expect(heroesComponent.heroes.length).toBe(2);
   });
 
   it('Should call Delete Hero ', () => {
     heroesComponent.heroes = HEROES;
     heroService.deleteHero.and.returnValue(of(true));
-    heroesComponent.delete(HEROES[0]);
+    heroesComponent.deleteHero(HEROES[0]);
 
      expect(heroService.deleteHero).toHaveBeenCalledWith( HEROES[0] );
   });
