@@ -72,6 +72,8 @@ describe('HeroesComponent - DEEP test', () => {
     (<HeroComponent>heroComponentDEs[0].componentInstance).delete.emit(); // IT just emitting the event which is captured by the
                                                                           // parent html template in '(delete)="deleteHero(hero)'
 
+    heroComponentDEs[0].triggerEventHandler('delete', null); // Triggering event '(delete)="deleteHero(hero)'
+
     expect(fixture.componentInstance.deleteHero).toHaveBeenCalledWith(HEROES[0]); //
   });
 });
