@@ -1,12 +1,25 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import {Component, EventEmitter, Input, NO_ERRORS_SCHEMA, Output} from '@angular/core';
+import {Component, Directive, EventEmitter, Input, NO_ERRORS_SCHEMA, Output} from '@angular/core';
 import {HeroesComponent} from './heroes.component';
 import {HeroService} from '../hero.service';
 import {of} from 'rxjs/internal/observable/of';
 import {Hero} from '../hero';
 import {HeroComponent} from '../hero/hero.component';
 import {By} from '@angular/platform-browser';
+
+@Directive({
+  selector: '[routerLink]',
+  host: {'(click)': 'onClick()'}
+})
+export class RouterLinkDirectiveStub {
+  @Input('routerLink') linkParams: any;
+  navigatedTo: any = null;
+
+  onClick() {
+    this.navigatedTo = this.linkParams;
+  }
+}
 
 describe('HeroesComponent - DEEP test', () => {
 
@@ -30,11 +43,11 @@ describe('HeroesComponent - DEEP test', () => {
     ];
 
     TestBed.configureTestingModule({
-      declarations: [HeroesComponent, HeroComponent],
+      declarations: [HeroesComponent, HeroComponent, RouterLinkDirectiveStub],
       providers: [
         {provide: HeroService, useValue: MockHeroService}
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      //schemas: [NO_ERRORS_SCHEMA]
     });
 
     fixture = TestBed.createComponent(HeroesComponent);
@@ -99,4 +112,22 @@ describe('HeroesComponent - DEEP test', () => {
     expect(content).toContain(nameToBeadded);
   });
 
+  it('Should have the correct router for the first Hero', () => {
+    MockHeroService.getHeroes.and.returnValue(of(HEROES));
+    fixture.detectChanges();
+
+    const heroComponentDEs = fixture.debugElement.queryAll(By.directive(HeroComponent))[0];
+
+    const routerLink = heroComponentDEs.queryAll(By.directive(RouterLinkDirectiveStub))[0];
+    console.warn('xxx');
+    console.log(heroComponentDEs.nativeElement);
+
+    const injected = routerLink.injector.get(RouterLinkDirectiveStub);
+    console.log(injected);
+
+    heroComponentDEs.queryAll(By.css('a'))[0].triggerEventHandler('click',null);
+    console.log(injected);
+
+    expect( injected.navigatedTo).toBe('/detail/1');
+  });
 });
